@@ -1,0 +1,1532 @@
+@import "tailwindcss";
+@import "@fontsource-variable/heebo";
+
+/* ---------- טוקנים: Apple, מצב בהיר ---------- */
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Heebo Variable", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  --color-background: #f2f2f7;
+  --color-surface: #ffffff;
+  --color-surface-2: #e9e9ee;
+  --color-border: #e3e3e8;
+  --color-foreground: #1c1c1e;
+  --color-muted: #8a8a8e;
+  --color-blue: #007aff;
+  --color-amber: #ff9500;
+  --color-teal: #34c759;
+  --color-danger: #ff3b30;
+  --color-ok: #34c759;
+  --color-warn: #ff9500;
+  /* סרגל צד כמו ב-macOS/iPadOS: גוון אחד מתחת לרקע */
+  --color-sidebar: #ececf1;
+  --color-separator: rgba(60, 60, 67, 0.16);
+  --color-fill: rgba(120, 120, 128, 0.12);
+}
+
+/* הצבע של הפרויקט או האייג'נט מוזרק בזמן ריצה על קונטיינר, לכן inline */
+@theme inline {
+  --color-accent: var(--agent-color, #007aff);
+}
+
+/* מצב כהה בצבעי iOS: לפי המערכת, אלא אם נבחר בהגדרות בהיר (data-theme="light") או כהה (data-theme="dark") */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-background: #000000;
+    --color-surface: #1c1c1e;
+    --color-surface-2: #2c2c2e;
+    --color-border: #38383a;
+    --color-foreground: #f5f5f7;
+    --color-muted: #8e8e93;
+    --color-blue: #0a84ff;
+    --color-amber: #ff9f0a;
+    --color-teal: #30d158;
+    --color-danger: #ff453a;
+    --color-ok: #30d158;
+    --color-warn: #ff9f0a;
+    --color-sidebar: #161618;
+    --color-separator: rgba(84, 84, 88, 0.5);
+    --color-fill: rgba(118, 118, 128, 0.24);
+  }
+}
+:root[data-theme="dark"] {
+  --color-sidebar: #161618;
+  --color-separator: rgba(84, 84, 88, 0.5);
+  --color-fill: rgba(118, 118, 128, 0.24);
+  --color-background: #000000;
+  --color-surface: #1c1c1e;
+  --color-surface-2: #2c2c2e;
+  --color-border: #38383a;
+  --color-foreground: #f5f5f7;
+  --color-muted: #8e8e93;
+  --color-blue: #0a84ff;
+  --color-amber: #ff9f0a;
+  --color-teal: #30d158;
+  --color-danger: #ff453a;
+  --color-ok: #30d158;
+  --color-warn: #ff9f0a;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* צבע ההדגשה שנבחר בהגדרות מחליף את הכחול */
+:root {
+  --color-blue: var(--user-accent, #007aff);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-blue: var(--user-accent, #0a84ff);
+  }
+}
+:root[data-theme="dark"] {
+  --color-blue: var(--user-accent, #0a84ff);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+  letter-spacing: -0.005em;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-blue) 25%, transparent);
+}
+
+code,
+pre,
+.ltr {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: isolate;
+}
+
+/* ---------- רכיבים ---------- */
+
+/* כרטיס: לבן, מעוגל, צל עדין, בלי מסגרת כמעט */
+/* מיקום יחסי רק כשהכרטיס לא צף: אחרת הכלל הזה (מחוץ לשכבות של Tailwind) דורס את absolute */
+.card:not(.absolute):not(.fixed):not(.sticky) {
+  position: relative;
+}
+/* כרטיס שקט: צל דק אחד, פינות 14. תפריטים צפים מוסיפים shadow-2xl משלהם */
+.card {
+  background: var(--color-surface);
+  border: 0.5px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.035);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .card {
+    box-shadow: none;
+  }
+}
+:root[data-theme="dark"] .card {
+  box-shadow: none;
+}
+
+/* נשאר כשם מחלקה מהעיצוב הקודם, בלי אפקט */
+.hud::before,
+.hud::after {
+  content: none;
+}
+
+/* כותרת קטע: קטן, אפור, כמו iOS */
+.mono-label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  font-variant-numeric: tabular-nums;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* נקודת סטטוס פשוטה */
+.lamp {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.pulse {
+  animation: pulse-dot 1.2s ease-in-out infinite;
+  /* שכבה משלו: השקיפות מונפשת ב-compositor ולא מחשבת סגנון בכל פריים */
+  will-change: opacity;
+}
+
+/* בועות בסגנון iMessage */
+.bubble-user {
+  background: var(--color-blue);
+  color: #ffffff;
+  border-radius: 20px;
+  border-end-end-radius: 6px;
+}
+.bubble-assistant {
+  background: var(--color-surface-2);
+  color: var(--color-foreground);
+  border-radius: 20px;
+  border-end-start-radius: 6px;
+}
+.transmission {
+  background: var(--color-blue);
+  color: #fff;
+  border-radius: 20px;
+}
+
+/* ---------- Markdown ---------- */
+.markdown :where(p, ul, ol, pre, blockquote, table) {
+  margin-block: 0.45rem;
+}
+.markdown :where(ul, ol) {
+  padding-inline-start: 1.25rem;
+}
+.markdown ul {
+  list-style: disc;
+}
+.markdown ol {
+  list-style: decimal;
+}
+.markdown :where(h1, h2, h3, h4) {
+  font-weight: 600;
+  margin-block: 0.75rem 0.25rem;
+}
+.markdown h1 {
+  font-size: 1.2rem;
+}
+.markdown h2 {
+  font-size: 1.1rem;
+}
+.markdown code {
+  font-family: var(--font-mono);
+  background: color-mix(in oklab, var(--color-foreground) 7%, transparent);
+  padding: 0.1em 0.35em;
+  border-radius: 0.35rem;
+  font-size: 0.85em;
+}
+.markdown pre {
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-border);
+  padding: 0.75rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-size: 0.8rem;
+}
+.markdown pre code {
+  background: none;
+  padding: 0;
+}
+.markdown a {
+  color: var(--color-blue);
+  text-decoration: none;
+}
+.markdown a:hover {
+  text-decoration: underline;
+}
+/* טבלה רחבה גוללת בתוך עצמה (כמו ב-GitHub). בלי זה היא הרחיבה את כל אזור ההודעות, הופיע פס גלילה אופקי,
+   וב-RTL הטקסט נחתך בצד שמאל של החלון (31/10, מסך מפוצל) */
+.markdown table {
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.markdown th,
+.markdown td {
+  border: 0.5px solid var(--color-border);
+  padding: 0.25rem 0.5rem;
+}
+.markdown blockquote {
+  border-inline-start: 3px solid var(--color-border);
+  padding-inline-start: 0.75rem;
+  color: var(--color-muted);
+}
+
+/* ---------- חלון Electron ---------- */
+.app-drag {
+  -webkit-app-region: drag;
+}
+.app-drag button,
+.app-drag select,
+.app-drag input,
+.app-drag a,
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+.desktop .main-header {
+  padding-inline-end: 84px;
+}
+
+/* ---------- פקדים ---------- */
+button,
+select,
+input,
+textarea {
+  font-family: inherit;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+button:active {
+  transform: scale(0.98);
+}
+select {
+  appearance: none;
+  background-color: var(--color-surface-2);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a8e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 0.55rem center;
+  padding-inline-end: 1.7rem;
+  border-radius: 10px;
+  border: none;
+  font-weight: 500;
+}
+input,
+textarea {
+  border-radius: 10px;
+}
+.btn-primary {
+  background: var(--color-blue);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 12px;
+}
+.btn-primary:hover {
+  filter: brightness(1.06);
+}
+.btn-ghost {
+  background: var(--color-surface-2);
+  color: var(--color-blue);
+  font-weight: 500;
+  border: none;
+  border-radius: 12px;
+}
+.btn-ghost:hover {
+  background: color-mix(in oklab, var(--color-surface-2) 80%, var(--color-blue) 20%);
+}
+.segmented {
+  background: var(--color-surface-2);
+  border-radius: 10px;
+  padding: 2px;
+}
+.segmented > button {
+  border-radius: 8px;
+  font-weight: 500;
+}
+.segmented > button[data-active="true"] {
+  background: var(--color-surface);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* כיוון לפי תוכן: עברית מימין לשמאל, אנגלית משמאל לימין, לכל פסקה בנפרד */
+[dir="auto"] {
+  text-align: start;
+  unicode-bidi: isolate;
+}
+/*
+ * שדות טקסט: הכיוון של כל שורה נקבע לפי התוכן (plaintext), אבל שדה ריק נשאר בכיוון של הממשק,
+ * כך ש-placeholder בעברית לא קופץ שמאלה. שדות LTR מפורשים (נתיבים, slug, קוד) לא נכללים.
+ */
+textarea:not(.ltr),
+input:not(.ltr):not([type="checkbox"]):not([type="color"]):not([type="time"]):not([type="range"]) {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+/* ---------- סבב ליטוש ויזואלי ---------- */
+
+/* כותרת זכוכית כמו ב-macOS */
+/*
+ * כותרות קבועות: רקע כמעט אטום בלי טשטוש. טשטוש מעל תוכן שגולל (הצ'אט, הרשימה) מחשב מחדש את כל מה שמתחתיו
+ * בכל פריים, וזה היה רוב העבודה של כרטיס המסך. הטשטוש נשאר רק בחלונות צפים זמניים (⌘K, טוסט, שיחה קולית).
+ */
+.glass {
+  background: color-mix(in oklab, var(--color-surface) 97%, var(--color-background));
+}
+
+/* סרגל כלים מקובץ: פקדים קשורים בקפסולה אחת */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 2px;
+  border-radius: 12px;
+  background: var(--color-surface-2);
+}
+.toolbar-sep {
+  width: 1px;
+  height: 16px;
+  background: color-mix(in oklab, var(--color-muted) 30%, transparent);
+  margin-inline: 1px;
+}
+.tool-btn {
+  width: 30px;
+  height: 28px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  color: var(--color-muted);
+}
+.tool-btn:hover:not(:disabled) {
+  color: var(--color-foreground);
+  background: color-mix(in oklab, var(--color-surface) 70%, transparent);
+}
+.tool-btn[data-active="true"] {
+  background: var(--color-surface);
+  color: var(--color-blue);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.tool-btn:disabled {
+  opacity: 0.35;
+}
+select.pill-select {
+  background-color: transparent;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  padding-block: 4px;
+  padding-inline-start: 8px;
+  max-width: 140px;
+}
+select.pill-select:hover:not(:disabled) {
+  background-color: color-mix(in oklab, var(--color-surface) 70%, transparent);
+}
+
+/* קריאות לכלים: שורת פעילות שקטה, לא כרטיס */
+.tool-card {
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--color-surface-2) 55%, transparent);
+  font-size: 13px;
+  overflow: hidden;
+}
+.tool-fade {
+  background: linear-gradient(to top, color-mix(in oklab, var(--color-surface-2) 55%, var(--color-background)), transparent);
+}
+.tool-result {
+  border-radius: 10px;
+  font-size: 13px;
+  overflow: hidden;
+  border-inline-start: 2px solid color-mix(in oklab, var(--color-muted) 35%, transparent);
+  background: transparent;
+}
+.tool-result.is-error {
+  border-inline-start-color: var(--color-danger);
+  background: color-mix(in oklab, var(--color-danger) 7%, transparent);
+}
+
+/* עמודות קנבן */
+.kanban-col {
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--color-surface-2) 45%, transparent);
+}
+.empty-col {
+  margin: 4px;
+  border: 1.5px dashed color-mix(in oklab, var(--color-muted) 30%, transparent);
+  border-radius: 14px;
+  padding: 18px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--color-muted);
+}
+
+/* מעבר עדין בין מסכים והופעת הודעות */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+main > * {
+  animation: fade-up 0.22s ease-out;
+}
+.bubble-user,
+.bubble-assistant,
+.card {
+  animation: fade-up 0.2s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  main > *,
+  .bubble-user,
+  .bubble-assistant,
+  .card {
+    animation: none;
+  }
+}
+
+/* פס גלילה דק בסגנון macOS */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-muted) 35%, transparent);
+  border-radius: 999px;
+  border: 2.5px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* טקסט מעורב עברית/אנגלית: כל פסקה מקבלת כיוון לפי התו החזק הראשון שלה */
+.bidi,
+.markdown [dir="auto"] {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+/* diff בתוך הצ'אט */
+.diff-inline {
+  padding-bottom: 6px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.diff-del {
+  background: color-mix(in oklab, var(--color-danger) 11%, transparent);
+  color: color-mix(in oklab, var(--color-danger) 70%, var(--color-foreground));
+  padding-inline-end: 12px;
+}
+.diff-add {
+  background: color-mix(in oklab, var(--color-teal) 12%, transparent);
+  color: color-mix(in oklab, var(--color-teal) 55%, var(--color-foreground));
+  padding-inline-end: 12px;
+}
+
+/* ---------- מצב שיחה קולית ---------- */
+.voice-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--color-background) 80%, transparent);
+  backdrop-filter: blur(40px) saturate(170%);
+  -webkit-backdrop-filter: blur(40px) saturate(170%);
+  animation: voice-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes voice-in {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* זוהר צבעוני שנע לאט ברקע */
+.voice-aurora {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  filter: blur(70px);
+  opacity: 0.55;
+}
+.voice-aurora span {
+  position: absolute;
+  width: 46%;
+  height: 46%;
+  border-radius: 50%;
+  animation: aurora 22s ease-in-out infinite alternate;
+}
+.voice-aurora span:nth-child(1) {
+  top: 18%;
+  left: 12%;
+  background: color-mix(in oklab, var(--orb) 70%, #64d2ff);
+}
+.voice-aurora span:nth-child(2) {
+  top: 40%;
+  right: 8%;
+  background: color-mix(in oklab, var(--orb) 55%, #bf5af2);
+  animation-duration: 28s;
+  animation-delay: -6s;
+}
+.voice-aurora span:nth-child(3) {
+  bottom: 6%;
+  left: 34%;
+  background: color-mix(in oklab, var(--orb) 60%, #30d158);
+  opacity: 0.6;
+  animation-duration: 34s;
+  animation-delay: -12s;
+}
+@keyframes aurora {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(8%, -6%) scale(1.15);
+  }
+  100% {
+    transform: translate(-6%, 8%) scale(0.95);
+  }
+}
+.phase-idle .voice-aurora {
+  opacity: 0.18;
+}
+.phase-speaking .voice-aurora {
+  opacity: 0.75;
+}
+.voice-top,
+.voice-center,
+.voice-dock {
+  position: relative;
+}
+.voice-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  -webkit-app-region: drag;
+}
+.voice-top button {
+  -webkit-app-region: no-drag;
+}
+.voice-who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.voice-live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-teal) 25%, transparent);
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+.voice-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: color-mix(in oklab, var(--color-surface) 70%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.voice-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 24px;
+}
+.voice-orb-btn {
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.voice-orb-btn:active {
+  transform: scale(0.96);
+}
+.voice-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-muted);
+  letter-spacing: 0.01em;
+}
+.voice-bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 34px;
+}
+.voice-bars span {
+  width: 4px;
+  border-radius: 4px;
+  background: var(--orb);
+  transition: height 0.08s ease-out;
+}
+.voice-dots {
+  width: 30px;
+  height: 8px;
+  background:
+    radial-gradient(circle, var(--color-muted) 3px, transparent 3.5px) 0 50% / 10px 8px repeat-x;
+  opacity: 0.35;
+}
+.voice-dots.is-on {
+  opacity: 1;
+  animation: dots 1.2s steps(3) infinite;
+}
+@keyframes dots {
+  to {
+    background-position: 30px 50%;
+  }
+}
+.voice-captions {
+  max-width: 560px;
+  min-height: 72px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: opacity 0.3s;
+}
+.voice-heard {
+  font-size: 14px;
+  color: var(--color-muted);
+  animation: fade-up 0.3s ease-out;
+}
+.voice-reply {
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  animation: fade-up 0.3s ease-out;
+}
+.voice-dock {
+  align-self: center;
+  display: flex;
+  gap: 14px;
+  padding: 10px;
+  margin-bottom: 34px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-surface) 60%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  box-shadow:
+    0 10px 30px -10px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.voice-btn {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in oklab, var(--color-surface) 85%, transparent);
+  color: var(--color-foreground);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.15s,
+    background-color 0.2s;
+}
+.voice-btn:hover {
+  transform: scale(1.06);
+}
+.voice-btn.is-muted {
+  background: var(--color-foreground);
+  color: var(--color-background);
+}
+.voice-btn.is-end {
+  background: var(--color-danger);
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .voice-stage,
+  .voice-aurora span,
+  .voice-live,
+  .voice-dots.is-on {
+    animation: none !important;
+  }
+}
+
+
+/* הגדרות קול מהירות במסך השיחה */
+.voice-settings-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 120px;
+}
+.voice-settings {
+  width: 300px;
+  padding: 16px;
+  border-radius: 20px;
+  background: color-mix(in oklab, var(--color-surface) 88%, transparent);
+  backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.3);
+  animation: fade-up 0.2s ease-out;
+}
+.voice-btn[data-on="true"] {
+  background: var(--color-surface);
+  color: var(--color-blue);
+}
+
+/* צפיפות: מצב קומפקטי מקטין ריווחים בסיידבר, בכרטיסים ובצ'אט */
+[data-density="compact"] aside .group\/row > button {
+  padding-block: 4px;
+}
+[data-density="compact"] .card {
+  border-radius: 14px;
+}
+[data-density="compact"] main .space-y-5 > * + * {
+  margin-top: 0.75rem;
+}
+
+/* ביטול אנימציות לפי בחירה בהגדרות */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* ---------- סבב iOS (22/10) ---------- */
+
+/* כותרת גדולה כמו ב-iOS: 34px, כבדה, צמודה */
+.large-title {
+  font-size: 32px;
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+}
+.eyebrow {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-muted);
+  letter-spacing: 0.01em;
+}
+
+/* רשימה מקובצת (inset grouped) כמו בהגדרות של iOS */
+.group-list {
+  background: var(--color-surface);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.group-list > * + * {
+  box-shadow: inset 0 0.5px 0 var(--color-separator);
+}
+.group-header {
+  font-size: 13px;
+  color: var(--color-muted);
+  padding-inline: 16px;
+  margin-bottom: 6px;
+}
+
+/* אייקון בריבוע צבעוני כמו בהגדרות של iOS */
+.ios-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+.ios-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* מילוי מערכת לשדות חיפוש וכפתורים משניים */
+.fill {
+  background: var(--color-fill);
+}
+
+/* טוסט צף בסגנון iOS */
+.ios-toast {
+  background: color-mix(in oklab, var(--color-surface) 82%, transparent);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.35);
+  border-radius: 999px;
+}
+
+/* שלד טעינה */
+@keyframes shimmer {
+  0% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+.skeleton {
+  background: var(--color-fill);
+  border-radius: 10px;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* מצב ריק בסגנון iOS */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 56px 24px;
+  color: var(--color-muted);
+}
+.empty-state .empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: var(--color-fill);
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+.empty-state h3 {
+  color: var(--color-foreground);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+/* קבוצת כלים מקופלת בצ'אט */
+.tool-group {
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--color-surface-2) 45%, transparent);
+  font-size: 13px;
+}
+
+/* תוצאת חיפוש בצ'אט */
+.find-hit {
+  outline: 2.5px solid var(--color-amber);
+  outline-offset: 3px;
+  transition: outline-color 0.3s;
+}
+
+/* מסך מחולק ל-3 עד 6: כותרת מינימלית בכל חלון */
+.pane-tiny .main-header .toolbar,
+.pane-tiny .main-header .mt-0\.5 {
+  display: none;
+}
+.pane-tiny .main-header {
+  padding-block: 6px;
+}
+.pane-tiny .px-5 {
+  padding-inline: 12px;
+}
+.pane-tiny .max-sm\:hidden,
+.pane-tiny .text-center.mt-1\.5 {
+  display: none;
+}
+
+/* בוררים בכותרת: רוחב לפי התוכן, בלי רווח ריק */
+select.pill-select {
+  field-sizing: content;
+  max-width: 170px;
+}
+
+/*
+ * כפתורי החלון של macOS (אדום, צהוב, ירוק): בממשק בעברית הם בצד ימין, בדיוק מעל הלוגו של מפקדה בסרגל הצד.
+ * בשורה העליונה של הסרגל משאירים להם מקום, ובמצב המצומצם מורידים את הכפתורים מתחתם.
+ */
+.desktop .side-top > div:first-child {
+  padding-inline-start: 16px;
+  min-height: 34px;
+}
+.desktop aside.activity-bar {
+  padding-top: 34px;
+}
+
+/* סרגל הפעילות (ActivityBar): באותו גוון של סרגל הצד, וגלילה בלי פס */
+.activity-bar {
+  background: var(--color-sidebar);
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * ערכת צבעים לסשן בודד (data-scheme על הקונטיינר של הצ'אט): אותם משתנים כמו ב-root, מוגדרים מחדש על האלמנט,
+ * כך שסשן אחד יכול להיות כהה בתוך ממשק בהיר ולהפך. כל ה-utilities של Tailwind קוראים את המשתנים, אז הכול עובר.
+ */
+[data-scheme="dark"] {
+  color-scheme: dark;
+  --color-background: #000000;
+  --color-surface: #1c1c1e;
+  --color-surface-2: #2c2c2e;
+  --color-border: #38383a;
+  --color-foreground: #f5f5f7;
+  --color-muted: #8e8e93;
+  --color-blue: var(--user-accent, #0a84ff);
+  --color-amber: #ff9f0a;
+  --color-teal: #30d158;
+  --color-danger: #ff453a;
+  --color-ok: #30d158;
+  --color-warn: #ff9f0a;
+  --color-sidebar: #161618;
+  --color-separator: rgba(84, 84, 88, 0.5);
+  --color-fill: rgba(118, 118, 128, 0.24);
+  color: var(--color-foreground);
+}
+[data-scheme="light"] {
+  color-scheme: light;
+  --color-background: #f2f2f7;
+  --color-surface: #ffffff;
+  --color-surface-2: #e9e9ee;
+  --color-border: #e3e3e8;
+  --color-foreground: #1c1c1e;
+  --color-muted: #8a8a8e;
+  --color-blue: var(--user-accent, #007aff);
+  --color-amber: #ff9500;
+  --color-teal: #34c759;
+  --color-danger: #ff3b30;
+  --color-ok: #34c759;
+  --color-warn: #ff9500;
+  --color-sidebar: #ececf1;
+  --color-separator: rgba(60, 60, 67, 0.16);
+  --color-fill: rgba(120, 120, 128, 0.12);
+  color: var(--color-foreground);
+}
+
+/* סשן עם רקע משלו: אזור ההודעות ושורת הכתיבה שקופים, כדי שהרקע של הקונטיינר ייראה */
+[data-chat-pane][data-bg] .pane-clear {
+  background: transparent;
+}
+
+/* בורר קטן ושקט מתחת לשדה ההודעה: טקסט עם חץ, בלי מסגרת */
+/*
+ * הבחירות מתחת לשדה ההודעה (אייג'נט, מודל, הרשאות): צ'יפים ברורים עם חץ, כדי שיהיה ברור שאפשר ללחוץ ולהחליף.
+ * ההרשאות צבועות לפי רמת הסיכון (data-mode): עריכות/אוטומטי בכתום, "מאשר הכול" באדום.
+ */
+.mini-select {
+  appearance: none;
+  background-color: var(--color-fill);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 11px;
+  background-position: right 7px center;
+  border: 0;
+  border-radius: 999px;
+  padding: 3px 22px 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-foreground);
+  cursor: pointer;
+  max-width: 12rem;
+  /* רוחב לפי האפשרות שנבחרה, לא לפי הארוכה ברשימה */
+  field-sizing: content;
+  transition: background-color 0.15s;
+}
+[dir="rtl"] .mini-select {
+  background-position: left 7px center;
+  padding: 3px 10px 3px 22px;
+}
+.mini-select:hover {
+  background-color: color-mix(in oklab, var(--color-fill) 100%, var(--color-foreground) 8%);
+}
+.mini-select:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--color-blue) 50%, transparent);
+}
+.mini-select:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.mini-select[data-mode="acceptEdits"],
+.mini-select[data-mode="auto"] {
+  background-color: color-mix(in oklab, var(--color-warn) 16%, transparent);
+  color: var(--color-warn);
+}
+.mini-select[data-mode="plan"] {
+  background-color: color-mix(in oklab, var(--color-teal) 16%, transparent);
+  color: var(--color-teal);
+}
+.mini-select[data-mode="bypassPermissions"],
+.mini-select[data-mode="dontAsk"] {
+  background-color: color-mix(in oklab, var(--color-danger) 16%, transparent);
+  color: var(--color-danger);
+}
+
+/* שורת המצב בתחתית (StatusBar), כמו ב-IDE */
+.status-bar {
+  background: var(--color-sidebar);
+}
+
+/* =====================================================================
+ * סגנון IDE (ברירת המחדל מ-31/10, prefs.skin): כמו VS Code. צפוף, פינות קטנות, קווי הפרדה במקום כרטיסים צפים,
+ * סרגל פעילות עם אייקונים בלבד ופס סימון, כרטיסיות לשיחות פתוחות (EditorTabs), שורת מצב צבעונית, צ'אט בלי בועות.
+ * הכול כאן, מחוץ לשכבות של Tailwind, ולכן גובר על המחלקות שבקומפוננטות. iOS = data-skin="ios", בלי שינוי.
+ * ===================================================================== */
+:root[data-skin="ide"] {
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3f3f3;
+  --color-border: #e5e5e5;
+  --color-foreground: #1f1f1f;
+  --color-muted: #6e6e6e;
+  --color-sidebar: #f8f8f8;
+  --color-separator: #e5e5e5;
+  --color-fill: rgba(0, 0, 0, 0.05);
+  --color-activity: #f8f8f8;
+  --color-tabbar: #f8f8f8;
+  --color-statusbar: var(--color-blue);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="ide"]:not([data-theme="light"]) {
+    --color-background: #1f1f1f;
+    --color-surface: #1f1f1f;
+    --color-surface-2: #2a2a2a;
+    --color-border: #2b2b2b;
+    --color-foreground: #cccccc;
+    --color-muted: #9d9d9d;
+    --color-sidebar: #181818;
+    --color-separator: #2b2b2b;
+    --color-fill: rgba(255, 255, 255, 0.06);
+    --color-activity: #181818;
+    --color-tabbar: #181818;
+  }
+}
+:root[data-skin="ide"][data-theme="dark"] {
+  --color-background: #1f1f1f;
+  --color-surface: #1f1f1f;
+  --color-surface-2: #2a2a2a;
+  --color-border: #2b2b2b;
+  --color-foreground: #cccccc;
+  --color-muted: #9d9d9d;
+  --color-sidebar: #181818;
+  --color-separator: #2b2b2b;
+  --color-fill: rgba(255, 255, 255, 0.06);
+  --color-activity: #181818;
+  --color-tabbar: #181818;
+}
+
+[data-skin="ide"] body {
+  font-size: 13.5px;
+  letter-spacing: 0;
+}
+
+/* כרטיסים: שטוחים, מסגרת דקה, פינות 6 */
+[data-skin="ide"] .card {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: none;
+}
+[data-skin="ide"] input,
+[data-skin="ide"] textarea,
+[data-skin="ide"] select {
+  border-radius: 4px;
+}
+[data-skin="ide"] .btn-primary,
+[data-skin="ide"] .btn-ghost {
+  border-radius: 4px;
+  font-weight: 500;
+}
+[data-skin="ide"] .segmented {
+  border-radius: 5px;
+}
+[data-skin="ide"] .segmented > button {
+  border-radius: 4px;
+}
+[data-skin="ide"] .group-list {
+  border-radius: 6px;
+}
+
+/* סרגל הפעילות: 48px, אייקונים בלבד (השם בריחוף), פס בצד של הפריט הפעיל */
+[data-skin="ide"] .activity-bar {
+  width: 48px !important;
+  background: var(--color-activity);
+  gap: 0;
+}
+[data-skin="ide"] .activity-label {
+  display: none;
+}
+[data-skin="ide"] .activity-item {
+  padding-block: 10px;
+  color: var(--color-muted);
+}
+[data-skin="ide"] .activity-item[data-active="true"],
+[data-skin="ide"] .activity-item:hover {
+  color: var(--color-foreground);
+}
+[data-skin="ide"] .activity-item .activity-icon {
+  background: transparent !important;
+  width: auto;
+  height: auto;
+}
+[data-skin="ide"] .activity-item .activity-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.6;
+}
+[data-skin="ide"] .activity-item[data-active="true"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 6px;
+  inset-inline-start: 0;
+  width: 2px;
+  background: var(--color-blue);
+}
+
+/* רשימת הסשנים: שורות צפופות, בחירה = רקע עדין ופס, לא גלולה כחולה */
+[data-skin="ide"] .session-row {
+  border-radius: 4px;
+  padding-block: 5px;
+  margin-block: 0;
+}
+[data-skin="ide"] .session-row[data-sel="true"] {
+  background: color-mix(in oklab, var(--color-blue) 14%, transparent) !important;
+  color: var(--color-foreground) !important;
+  box-shadow: none !important;
+  border-inline-start: 2px solid var(--color-blue);
+}
+[data-skin="ide"] .session-row[data-sel="true"] [class*="text-white"] {
+  color: var(--color-muted) !important;
+}
+[data-skin="ide"] .session-row[data-sel="true"] [class*="bg-white"] {
+  background: var(--color-fill) !important;
+}
+
+/* צ'אט: בלי בועות. הודעת המשתמש בקופסה עדינה ברוחב מלא, התשובה כטקסט רגיל */
+[data-skin="ide"] .bubble-user {
+  background: var(--color-surface-2);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  max-width: 100% !important;
+  width: 100%;
+  font-size: 14px !important;
+}
+[data-skin="ide"] .bubble-assistant {
+  background: transparent;
+  border-radius: 0;
+  padding-inline: 2px !important;
+  max-width: 100% !important;
+  font-size: 14px;
+}
+
+/* שורת המצב: פס צבעוני עם טקסט לבן, כמו ב-VS Code */
+[data-skin="ide"] .status-bar {
+  background: var(--color-statusbar);
+  color: #ffffff !important;
+  border-top: none;
+  height: 22px !important;
+}
+[data-skin="ide"] .status-bar :where(.text-ok, .text-warn, .text-muted) {
+  color: #ffffff !important;
+}
+[data-skin="ide"] .status-bar .status-item {
+  padding-inline: 6px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+}
+[data-skin="ide"] .status-bar .status-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* כרטיסיות של שיחות פתוחות (EditorTabs) */
+.editor-tabs {
+  display: flex;
+  align-items: stretch;
+  height: 35px;
+  background: var(--color-tabbar);
+  border-bottom: 1px solid var(--color-separator);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.editor-tabs::-webkit-scrollbar {
+  display: none;
+}
+.editor-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 110px;
+  max-width: 220px;
+  padding-inline: 10px 6px;
+  font-size: 12.5px;
+  color: var(--color-muted);
+  border-inline-end: 1px solid var(--color-separator);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.editor-tab:hover {
+  background: var(--color-fill);
+}
+.editor-tab[data-active="true"] {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+.editor-tab[data-active="true"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 2px;
+  background: var(--color-blue);
+}
+.editor-tab[data-active="true"] {
+  margin-bottom: -1px;
+}
+/* מוצג עכשיו באחד החלונות של המסך המפוצל (לא הראשי): בולט יותר מכרטיסייה ברקע, עם מספר החלון */
+.editor-tab[data-visible="true"]:not([data-active="true"]) {
+  color: var(--color-foreground);
+  background: color-mix(in oklab, var(--color-background) 70%, transparent);
+}
+.editor-tab[data-visible="true"]:not([data-active="true"])::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 2px;
+  background: color-mix(in oklab, var(--color-blue) 45%, transparent);
+}
+.editor-tab .tab-pane {
+  font-size: 10px;
+  line-height: 14px;
+  min-width: 14px;
+  padding-inline: 3px;
+  border-radius: 3px;
+  text-align: center;
+  background: var(--color-fill);
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+.editor-tab[data-active="true"] .tab-pane {
+  background: var(--color-blue);
+  color: #fff;
+}
+.editor-tab .tab-close {
+  opacity: 0;
+  border-radius: 4px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+.editor-tab:hover .tab-close,
+.editor-tab[data-active="true"] .tab-close {
+  opacity: 0.7;
+}
+.editor-tab .tab-close:hover {
+  opacity: 1;
+  background: var(--color-fill);
+}
+
+/* שדה ההודעה: תיבה מלבנית כמו בצ'אט של IDE, לא גלולה */
+[data-skin="ide"] .composer-box {
+  border-radius: 6px;
+  box-shadow: none;
+  padding-inline: 10px;
+}
+[data-skin="ide"] .composer-box button {
+  border-radius: 4px;
+}
+/* סרגל הצד: חיפוש מלבני, כותרות קבוצה צפופות */
+[data-skin="ide"] .sidebar-search {
+  border-radius: 4px;
+  padding-block: 5px;
+}
+[data-skin="ide"] .group-head {
+  border-radius: 4px;
+  padding-block: 2px;
+}
+[data-skin="ide"] aside {
+  background: var(--color-sidebar);
+}
+
+/* "איפה השיחה הזו": לחיצה על כרטיסייה של שיחה שמוצגת במסך המפוצל מסמנת את החלון שלה (EditorTabs → focusPane) */
+.pane-flash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 3px solid var(--color-blue);
+  pointer-events: none;
+  z-index: 30;
+  animation: pane-flash 1.1s ease-in-out;
+  opacity: 0;
+}
+@keyframes pane-flash {
+  0%, 50%, 100% {
+    opacity: 0;
+  }
+  25%, 75% {
+    opacity: 1;
+  }
+}
+
+/* הגדרות ← ספקים: רשימה מקובצת (כמו בהגדרות של iOS / VS Code), שורות עם קו מפריד, ותגי מצב */
+.provider-list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+[data-skin="ide"] .provider-list {
+  border-radius: 6px;
+}
+.provider-row + .provider-row {
+  border-top: 1px solid var(--color-separator);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  line-height: 18px;
+  padding-inline: 7px;
+  border-radius: 999px;
+  background: var(--color-fill);
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+.pill-ok {
+  background: color-mix(in oklab, var(--color-ok) 16%, transparent);
+  color: var(--color-ok);
+}
+.pill-warn {
+  background: color-mix(in oklab, var(--color-warn) 18%, transparent);
+  color: var(--color-warn);
+}
+.pill-blue {
+  background: color-mix(in oklab, var(--color-blue) 16%, transparent);
+  color: var(--color-blue);
+}
+.pill-ok::before,
+.pill-warn::before,
+.pill-blue::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* =====================================================================
+ * IDE: יישור אחרי מעבר QA על כל המסכים (1/11). סקאלה אחת: כותרת עמוד 20, טקסט 13-14, תוויות 11-12; פינות 4-6.
+ * ===================================================================== */
+/* כותרות עמוד: בלי ה-Large Title של iOS */
+[data-skin="ide"] .large-title {
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+[data-skin="ide"] .eyebrow {
+  font-size: 11.5px;
+  font-weight: 500;
+}
+/* קנבן, כלים ותוצאות: פינות קטנות ורקע שקט */
+[data-skin="ide"] .kanban-col {
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--color-surface-2) 60%, transparent);
+  border: 1px solid var(--color-border);
+}
+[data-skin="ide"] .empty-col {
+  border-radius: 4px;
+  border-width: 1px;
+}
+[data-skin="ide"] .tool-card,
+[data-skin="ide"] .tool-group {
+  border-radius: 6px;
+}
+/* צ'יפים ותגיות בצורת גלולה: מלבן מעוגל קלות. לא נוגע בנקודות ובכפתורים עגולים קבועי גודל (size-*) */
+[data-skin="ide"] button.rounded-full:not([class*="size-"]),
+[data-skin="ide"] a.rounded-full:not([class*="size-"]) {
+  border-radius: 5px;
+}
+[data-skin="ide"] span.rounded-full[class*="px-"] {
+  border-radius: 4px;
+}
+[data-skin="ide"] .pill {
+  border-radius: 4px;
+}
+/* רשימת הסשנים: אותו גודל טקסט כמו שאר הממשק */
+[data-skin="ide"] .session-row [class*="text-[14.5px]"] {
+  font-size: 13.5px;
+}
+[data-skin="ide"] .group-head {
+  font-size: 13px;
+}
+/* ריבוע האייקון בהגדרות ובכרטיסים */
+[data-skin="ide"] .ios-icon {
+  border-radius: 5px;
+}
+
+/* גרירת כרטיסייה: קו כחול במקום שבו היא תיכנס (לפני הכרטיסייה שמרחפים עליה) */
+.editor-tab[data-drop="true"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 4px;
+  inset-inline-start: -1px;
+  width: 2px;
+  background: var(--color-blue);
+  z-index: 2;
+}
+
+/* סיבוב על אלמנט HTML (ראו Spinner.tsx): עובר ל-compositor ולא מחשב סגנון בכל פריים */
+.spin-box {
+  display: inline-flex;
+  flex-shrink: 0;
+  animation: spin-box 1s linear infinite;
+}
+@keyframes spin-box {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin-box {
+    animation-duration: 3s;
+  }
+}
+/* החלון לא בפוקוס (main.tsx): הספינרים והנקודות המהבהבות עומדים במקום */
+:root[data-blurred] .spin-box,
+:root[data-blurred] .pulse {
+  animation-play-state: paused;
+}

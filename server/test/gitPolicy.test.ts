@@ -1,0 +1,136 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { analyzeShell } from "../src/gitPolicy.js";
+
+// פקודות שבסשן של משימה חייבות להיחסם, כולל הצורות העוקפות
+const BLOCK: Array<[string, string]> = [
+  ["git commit -m x", "commit"],
+  ["git commit --amend --no-edit", "commit"],
+  ["git merge --no-ff mifkada/task-faa1b8", "merge"],
+  ["git rebase main", "rebase"],
+  ["git rebase --continue", "rebase"],
+  ["git push", "push"],
+  ["git push origin main --force", "push"],
+  ["git reset --hard HEAD~1", "reset --hard"],
+  ["git reset --soft HEAD~1", "reset --soft"],
+  ["git branch -D old", "branch -D"],
+  ["git branch -df old", "branch -D"],
+  ["git branch --delete --force old", "branch -D"],
+  ["git tag v1.0", "tag"],
+  ["git tag -a v1 -m 'release'", "tag"],
+  ["git tag -d v1", "tag"],
+  ["git worktree remove ../wt", "worktree remove"],
+  ["git worktree remove --force /tmp/x", "worktree remove"],
+  ["git cherry-pick abc123", "cherry-pick"],
+  ["git pull --rebase", "pull"],
+  // המקרה של 31/10: מה-worktree לריפו הראשי
+  ["git -C /Users/me/projects/mifkada merge --no-ff -m 'Merge' mifkada/task-faa1b8", "merge"],
+  ["git -C ~/projects/mifkada commit -am x", "commit"],
+  ['git -C "/path with space" push', "push"],
+  ["git -c user.name=x -c user.email=y commit -m z", "commit"],
+  ["git --git-dir=/r/.git --work-tree=/r commit -m z", "commit"],
+  ["git --no-pager -C . commit -m z", "commit"],
+  ["/usr/bin/git commit -m x", "commit"],
+  ["cd ~/projects/mifkada && git merge --no-ff x", "merge"],
+  ["git add -A && git commit -m x", "commit"],
+  ["npm test; git commit -m x", "commit"],
+  ["npm test || git push", "push"],
+  ["git status | head; git push", "push"],
+  ["(cd /repo && git commit -m x)", "commit"],
+  ["{ git commit -m x; }", "commit"],
+  ["sh -c 'git commit -m x'", "commit"],
+  ['bash -lc "cd /repo && git push"', "push"],
+  ["zsh -c 'git merge x'", "merge"],
+  ["eval 'git commit -m x'", "commit"],
+  ["env git commit -m x", "commit"],
+  ["env -i PATH=/usr/bin git commit -m x", "commit"],
+  ["env -u FOO -C /repo git push", "push"],
+  ["env -S 'git push'", "push"],
+  ["GIT_AUTHOR_NAME=x git commit -m y", "commit"],
+  ["command git commit -m x", "commit"],
+  ["exec git push", "push"],
+  ["nohup git push &", "push"],
+  ["sudo -u dn git push", "push"],
+  ["timeout 30 git push", "push"],
+  ["echo main | xargs git merge", "merge"],
+  ["echo $(git commit -m x)", "commit"],
+  ["echo `git push`", "push"],
+  ['echo "$(git commit -m x)"', "commit"],
+  ["if true; then git commit -m x; fi", "commit"],
+  ["git status\ngit commit -m x", "commit"],
+  ["git commit -m x 2>&1 | tail -5", "commit"],
+  ["git commit -F - <<'EOF'\nmsg\nEOF", "commit"],
+  ["$GIT commit -m x", "commit"],
+  ["git -c alias.ci=commit ci -m x", "commit"],
+  ["git -c 'alias.p=!git push' p", "push"],
+  ["git config alias.ci commit", "config alias"],
+  ["gh pr create --fill", "gh pr create"],
+  ["gh pr merge 12 --squash", "gh pr merge"],
+  ["gh api -X POST repos/o/r/merges", "gh api"],
+  ["node ~/projects/mifkada/bin/mifkada-task.mjs add --title t --prompt p --allow-git --run", "היתר git למשימה"],
+  ["curl --unix-socket s -X POST http://x/api/tasks/abc/merge", "מיזוג משימה דרך ה-API"],
+  ["curl --unix-socket s -X PATCH http://x/api/tasks/abc -d '{\"allowGit\":true}'", "היתר git למשימה"],
+];
+
+// פקודות שעוברות: קריאה בלבד, ועבודה רגילה בענף
+const PASS = [
+  "git status",
+  "git status --short",
+  "git -C /Users/me/projects/mifkada status",
+  "git log --oneline -5",
+  "git log main..HEAD",
+  "git diff",
+  "git diff --stat HEAD",
+  "git show 021c67a",
+  "git show HEAD:server/src/live.ts",
+  "git worktree list",
+  "git worktree list --porcelain",
+  "git branch",
+  "git branch -a",
+  "git branch --show-current",
+  "git branch -d merged-branch",
+  "git tag",
+  "git tag -l 'v*'",
+  "git tag --contains abc",
+  "git rev-parse --show-toplevel",
+  "git add -A",
+  "git stash list",
+  "git checkout -- file.ts",
+  "git restore src/a.ts",
+  "git reset",
+  "git reset HEAD file.ts",
+  "git merge-base main HEAD",
+  "git merge --abort",
+  "git rebase --abort",
+  "git config --get user.name",
+  "git config --get-regexp alias",
+  "git blame src/a.ts",
+  "cd /repo && git log -3 && git diff",
+  "npm run typecheck && npm test",
+  "echo 'git commit is blocked in tasks'",
+  'echo "please do not git push"',
+  "grep -rn 'git commit' server/src",
+  "grep -rn allowGit server/src",
+  "cat > notes.md <<'EOF'\ngit commit -m x\ngit push\nEOF",
+  "# git push\nls",
+  "rg 'git push' -n",
+  "gh pr list",
+  "gh pr view 12",
+  "gh api repos/o/r/pulls",
+  "node bin/mifkada-task.mjs list --open",
+  "ls -la; pwd",
+];
+
+test("gitPolicy: חוסם commit/merge/push וכל הצורות העוקפות", () => {
+  for (const [cmd, op] of BLOCK) assert.equal(analyzeShell(cmd)?.op, op, cmd);
+});
+
+test("gitPolicy: קריאה בלבד ועבודה רגילה עוברות", () => {
+  for (const cmd of PASS) assert.equal(analyzeShell(cmd), null, cmd);
+});
+
+test("gitPolicy: alias מה-gitconfig", () => {
+  assert.equal(analyzeShell("git ci -m x", { ci: "commit" })?.op, "commit");
+  assert.equal(analyzeShell("git up", { up: "!git pull --rebase && git push" })?.op, "pull");
+  assert.equal(analyzeShell("git st", { st: "status -sb" }), null);
+});

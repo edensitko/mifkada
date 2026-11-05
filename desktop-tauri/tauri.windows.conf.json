@@ -1,0 +1,6 @@
+{
+  "bundle": {
+    "resources": { "stage/app/": "app/", "stage/node": null, "stage/node.exe": "node.exe" },
+    "icon": ["icons/icon.png", "icons/icon.ico"]
+  }
+}

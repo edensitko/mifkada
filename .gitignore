@@ -1,0 +1,12 @@
+node_modules
+dist/
+data/
+*.log
+.DS_Store
+release/
+
+# מקומי
+.env*
+*.sock
+.mifkada-worktrees/
+dist-npm/

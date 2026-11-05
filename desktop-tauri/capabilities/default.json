@@ -1,0 +1,23 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "החלון הראשי: רק הגשר לשרת של מפקדה (net_*)",
+  "windows": [
+    "main"
+  ],
+  "remote": {
+    "urls": [
+      "mifkada://app/*",
+      "http://mifkada.app/*",
+      "mifkada://*"
+    ]
+  },
+  "permissions": [
+    "core:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-toggle-maximize",
+    "allow-net-open",
+    "allow-net-send",
+    "allow-net-close"
+  ]
+}
